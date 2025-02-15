@@ -1,34 +1,38 @@
-# Add project specific ProGuard rules here.
-# You can control the set of applied configuration files using the
-# proguardFiles setting in build.gradle.
-#
-# For more details, see
-#   http://developer.android.com/guide/developing/tools/proguard.html
+# Mantener información de genéricos y anotaciones
+-keepattributes Signature, InnerClasses, EnclosingMethod, Exceptions, *Annotation*
 
-# If your project uses WebView with JS, uncomment the following
-# and specify the fully qualified class name to the JavaScript interface
-# class:
-#-keepclassmembers class fqcn.of.javascript.interface.for.webview {
-#   public *;
-#}
-
-# Uncomment this to preserve the line number information for
-# debugging stack traces.
-#-keepattributes SourceFile,LineNumberTable
-
-# If you keep the line number information, uncomment this to
-# hide the original source file name.
-#-renamesourcefileattribute SourceFile
-# Keep the no-argument constructors for Firestore entities
--keepclassmembers class com.example.todoapp.taskcategory.data.CategoryEntity {
-    public <init>();
+# Reglas para GSON
+-keepclassmembers class com.example.todoapp.** {
+  public <init>();
 }
 
--keepclassmembers class com.example.todoapp.addtasks.data.TaskEntity {
-    public <init>();
+-keep class com.example.todoapp.** { *; }
+-keep class * implements java.io.Serializable { *; }
+
+# Evitar ofuscar modelos y DTOs
+-keep class com.example.todoapp.**.TaskEntity { *; }
+-keep class com.example.todoapp.**.CategoryEntity { *; }
+-keep class com.example.todoapp.holidays.data.model.** { *; }
+
+# Reglas para Hilt
+-keep @dagger.hilt.InstallIn class * { *; }
+-keep @dagger.hilt.android.AndroidEntryPoint class * { *; }
+-keepclassmembers @dagger.hilt.InstallIn class * {
+    <init>();
 }
 
--if class androidx.credentials.CredentialManager
--keep class androidx.credentials.playservices.** {
-  *;
+# Reglas para Retrofit y OkHttp
+-keep class retrofit2.** { *; }
+-keepclasseswithmembers class * {
+    @retrofit2.http.* <methods>;
 }
+
+# Reglas para Room
+-keep class * extends androidx.room.RoomDatabase {
+    public static <methods>;
+}
+
+# Reglas para Firebase
+-keep class com.google.firebase.** { *; }
+-keep class com.google.android.gms.** { *; }
+
