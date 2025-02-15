@@ -3,6 +3,7 @@ package com.example.todoapp.settings.drive.data
 import android.util.Log
 import com.example.todoapp.addtasks.data.TaskEntity
 import com.example.todoapp.taskcategory.data.CategoryEntity
+import com.example.todoapp.utils.Logger
 import com.google.api.client.http.InputStreamContent
 import com.google.api.services.drive.Drive
 import com.google.api.services.drive.model.File
@@ -82,15 +83,16 @@ class GoogleDriveRepository @Inject constructor() {
         Log.d("GoogleDriveRepository", message)
     }
 
-    private fun logError(message: String, e: Exception? = null) {
-        Log.e("GoogleDriveRepository", "$message ${e?.message}")
-    }
+
 
     private fun <T> executeDriveAction(action: () -> T): T? {
         return try {
             action()
         } catch (e: Exception) {
-            logError("Error en la acción de Google Drive", e)
+            Logger.error(
+                "GoogleDriveRepository",
+                "Error al ejecutar acción en Google Drive: $e",
+            )
             null
         }
     }
@@ -122,12 +124,7 @@ class GoogleDriveRepository @Inject constructor() {
         taskFiles?.forEach { file ->
             val json = downloadFileContent(driveService, file.id)
             json?.let {
-                // Convertir el JSON a un objeto TaskEntity
-                val jsonObject = Gson().fromJson(it, JsonObject::class.java)
-                // Extraer el objeto taskEntity del JSON
-                val taskJson = jsonObject.getAsJsonObject("taskEntity")
-                // Convertir el objeto JSON a un objeto TaskEntity
-                val taskEntity = Gson().fromJson(taskJson, TaskEntity::class.java)
+                val taskEntity = Gson().fromJson(json, TaskEntity::class.java)
                 Log.d("GoogleDriveRepository", "Task entity: $taskEntity")
                 tasks.add(taskEntity)
             }
